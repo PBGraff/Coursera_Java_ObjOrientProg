@@ -62,13 +62,13 @@ public class EarthquakeCityMap extends PApplet {
 	
 	public void setup() {		
 		// (1) Initializing canvas and map tiles
-		size(900, 700, OPENGL);
+		size(1100, 700, OPENGL);
 		if (offline) {
-		    map = new UnfoldingMap(this, 200, 50, 650, 600, new MBTilesMapProvider(mbTilesString));
+		    map = new UnfoldingMap(this, 200, 50, 850, 600, new MBTilesMapProvider(mbTilesString));
 		    earthquakesURL = "2.5_week.atom";  // The same feed, but saved August 7, 2015
 		}
 		else {
-			map = new UnfoldingMap(this, 200, 50, 650, 600, new Google.GoogleMapProvider());
+			map = new UnfoldingMap(this, 200, 50, 850, 600, new Google.GoogleMapProvider());
 			// IF YOU WANT TO TEST WITH A LOCAL FILE, uncomment the next line
 		    //earthquakesURL = "2.5_week.atom";
 		}
@@ -165,6 +165,13 @@ public class EarthquakeCityMap extends PApplet {
 		// IMPLEMENT THIS: loop over all countries to check if location is in any of them
 		
 		// TODO: Implement this method using the helper method isInCountry
+		for (Marker country : countryMarkers)
+		{
+			if (isInCountry(earthquake, country))
+			{
+				return true;
+			}
+		}
 		
 		// not inside any country
 		return false;
@@ -179,6 +186,21 @@ public class EarthquakeCityMap extends PApplet {
 	private void printQuakes() 
 	{
 		// TODO: Implement this method
+		for (Marker country : countryMarkers)
+		{
+			int count = 0;
+			for (Marker quake : quakeMarkers)
+			{
+				if (((EarthquakeMarker) quake).isOnLand && ((LandQuakeMarker) quake).getCountry().equals(country.getProperty("name")))
+				{
+					count++;
+				}
+			}
+			if (count > 0)
+			{
+				System.out.println(count+" earthquakes in "+country.getProperty("name"));
+			}
+		}
 	}
 	
 	
