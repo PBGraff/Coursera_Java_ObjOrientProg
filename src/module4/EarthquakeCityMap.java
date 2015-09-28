@@ -11,6 +11,7 @@ import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.AbstractShapeMarker;
 import de.fhpotsdam.unfolding.marker.Marker;
 import de.fhpotsdam.unfolding.marker.MultiMarker;
+import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import de.fhpotsdam.unfolding.providers.Google;
 import de.fhpotsdam.unfolding.providers.MBTilesMapProvider;
 import de.fhpotsdam.unfolding.utils.MapUtils;
@@ -134,24 +135,54 @@ public class EarthquakeCityMap extends PApplet {
 	private void addKey() {	
 		// Remember you can use Processing's graphics methods here
 		fill(255, 250, 240);
-		rect(25, 50, 150, 250);
+		rect(25, 50, 150, 275);
 		
 		fill(0);
 		textAlign(LEFT, CENTER);
-		textSize(12);
+		textSize(14);
 		text("Earthquake Key", 50, 75);
+		textSize(12);
 		
-		fill(color(255, 0, 0));
-		ellipse(50, 125, 15, 15);
+		//fill(color(255, 0, 0));
+		//ellipse(50, 125, 15, 15);
+		//fill(color(255, 255, 0));
+		//ellipse(50, 175, 10, 10);
+		//fill(color(0, 0, 255));
+		//ellipse(50, 225, 5, 5);
+		// city marker
+		fill(color(255, 0, 255));
+		triangle(46, 129, 54, 129, 50, 119);
+		// land and ocean quake markers
+		fill(color(255, 255, 255));
+		ellipse(50, 155, 12, 12);
+		rect(44, 169, 12, 12);
+		// depth markers
+		// shallow
 		fill(color(255, 255, 0));
-		ellipse(50, 175, 10, 10);
+		ellipse(50, 225, 12, 12);
+		// intermediate
 		fill(color(0, 0, 255));
-		ellipse(50, 225, 5, 5);
+		ellipse(50, 245, 12, 12);
+		// deep
+		fill(color(255, 0, 0));
+		ellipse(50, 265, 12, 12);
+		// past day
+		fill(color(0, 0, 0));
+		line(45, 290, 55, 300);
+		line(55, 290, 45, 300);
 		
 		fill(0, 0, 0);
-		text("5.0+ Magnitude", 75, 125);
-		text("4.0+ Magnitude", 75, 175);
-		text("Below 4.0", 75, 225);
+		//text("5.0+ Magnitude", 75, 125);
+		//text("4.0+ Magnitude", 75, 175);
+		//text("Below 4.0", 75, 225);
+		text("City", 75, 125);
+		text("Land Quake", 75, 155);
+		text("Ocean Quake", 75, 175);
+		text("Size ~ Magnitude", 50, 195);
+		text("Shallow", 75, 225);
+		text("Intermediate", 75, 245);
+		text("Deep", 75, 265);
+		text("Past Day", 75, 295);
 	}
 
 	
@@ -185,13 +216,16 @@ public class EarthquakeCityMap extends PApplet {
 	// And LandQuakeMarkers have a "country" property set.
 	private void printQuakes() 
 	{
+		int oceanquakes = 0;
+		
 		// TODO: Implement this method
 		for (Marker country : countryMarkers)
 		{
+			String countryName = country.getProperty("name").toString();
 			int count = 0;
 			for (Marker quake : quakeMarkers)
 			{
-				if (((EarthquakeMarker) quake).isOnLand && ((LandQuakeMarker) quake).getCountry().equals(country.getProperty("name")))
+				if (((EarthquakeMarker) quake).isOnLand && ((LandQuakeMarker) quake).getCountry().equals(countryName))
 				{
 					count++;
 				}
@@ -201,6 +235,14 @@ public class EarthquakeCityMap extends PApplet {
 				System.out.println(count+" earthquakes in "+country.getProperty("name"));
 			}
 		}
+		for (Marker quake : quakeMarkers)
+		{
+			if (!(((EarthquakeMarker) quake).isOnLand))
+			{
+				oceanquakes++;
+			}
+		}
+		System.out.println(oceanquakes+" ocean earthquakes");
 	}
 	
 	
