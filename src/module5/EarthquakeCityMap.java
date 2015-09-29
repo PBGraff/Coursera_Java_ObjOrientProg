@@ -145,7 +145,6 @@ public class EarthquakeCityMap extends PApplet {
 	// 
 	private void selectMarkerIfHover(List<Marker> markers)
 	{
-		// TODO: Implement this method
 		for ( Marker m : markers )
 		{
 			if (lastSelected == null && m.isInside(map, mouseX, mouseY))
@@ -167,6 +166,52 @@ public class EarthquakeCityMap extends PApplet {
 		// TODO: Implement this method
 		// Hint: You probably want a helper method or two to keep this code
 		// from getting too long/disorganized
+		if ( lastClicked != null ){
+			lastClicked = null;
+			unhideMarkers();
+		}
+		else
+		{
+			Marker qclicked = whichEarthquake();
+			Marker cclicked = whichCity();
+			if (qclicked == null && cclicked == null)
+			{
+				// do nothing
+			}
+			else
+			{
+				// first hide everything, then we'll unhide what needs to be
+				hideMarkers();
+				
+				// prefer quakes to cities
+				if (qclicked != null)
+				{
+					MarkerClicked(qclicked);
+					
+					double threat = ((EarthquakeMarker) qclicked).threatCircle();
+					for (Marker city : cityMarkers)
+					{
+						if (qclicked.getDistanceTo(city.getLocation()) <= threat)
+						{
+							city.setHidden(false);
+						}
+					}
+				}
+				else
+				{
+					MarkerClicked(cclicked);
+					
+					for (Marker quake : quakeMarkers)
+					{
+						double threat = ((EarthquakeMarker) quake).threatCircle();
+						if (cclicked.getDistanceTo(quake.getLocation()) <= threat)
+						{
+							quake.setHidden(false);
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	
@@ -179,6 +224,49 @@ public class EarthquakeCityMap extends PApplet {
 		for(Marker marker : cityMarkers) {
 			marker.setHidden(false);
 		}
+	}
+	
+	// loop over and hide all markers
+	private void hideMarkers() {
+		for(Marker marker : quakeMarkers) {
+			marker.setHidden(true);
+		}
+			
+		for(Marker marker : cityMarkers) {
+			marker.setHidden(true);
+		}
+	}
+	
+	private Marker whichEarthquake()
+	{
+		Marker q = null;
+		for (Marker m : quakeMarkers)
+		{
+			if (m.isInside(map, mouseX, mouseY))
+			{
+				q = m;
+			}
+		}
+		return q;
+	}
+	
+	private Marker whichCity()
+	{
+		Marker c = null;
+		for (Marker m : cityMarkers)
+		{
+			if (m.isInside(map, mouseX, mouseY))
+			{
+				c = m;
+			}
+		}
+		return c;
+	}
+	
+	private void MarkerClicked(Marker m)
+	{
+		m.setHidden(false);
+		lastClicked = (CommonMarker) m;
 	}
 	
 	// helper method to draw key in GUI
