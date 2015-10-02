@@ -85,7 +85,7 @@ public class EarthquakeCityMap extends PApplet {
 		//earthquakesURL = "test2.atom";
 		
 		// Uncomment this line to take the quiz
-		//earthquakesURL = "quiz2.atom";
+		earthquakesURL = "quiz2.atom";
 		
 		
 		// (2) Reading in earthquake data and geometric properties
@@ -117,7 +117,7 @@ public class EarthquakeCityMap extends PApplet {
 
 	    // could be used for debugging
 	    printQuakes();
-	    sortAndPrint(10);
+	    sortAndPrint(1000);
 	 		
 	    // (3) Add markers to map
 	    //     NOTE: Country markers are not added to the map.  They are used
@@ -133,9 +133,75 @@ public class EarthquakeCityMap extends PApplet {
 		background(0);
 		map.draw();
 		addKey();
-		
+		addPopup();
 	}
 	
+	
+	private void addPopup()
+	{
+		for (Marker c : cityMarkers)
+		{
+			CityMarker city = (CityMarker) c;
+			if (city.getClicked())
+			{
+				int nearbyQuakes = 0;
+				double avgMag = 0.0;
+				EarthquakeMarker biggest = null;
+				
+				for (Marker q : quakeMarkers)
+				{
+					EarthquakeMarker quake = (EarthquakeMarker) q;
+					if (city.getDistanceTo(quake.getLocation()) < quake.threatCircle())
+					{
+						nearbyQuakes++;
+						avgMag += quake.getMagnitude();
+						if (biggest == null || biggest.getMagnitude() < quake.getMagnitude())
+						{
+							biggest = quake;
+						}
+					}
+				}
+				if (nearbyQuakes > 0)
+				{
+					avgMag /= (double) nearbyQuakes;
+				}
+				
+				// make box and fill with stats
+				fill(255, 250, 240);
+				
+				int xbase = 25;
+				int ybase = 325;
+				
+				rect(xbase, ybase, 150, 170);
+				
+				fill(0);
+				textAlign(LEFT, CENTER);
+				textSize(12);
+				text("Summary Stats", xbase+25, ybase+25);
+				
+				text(city.getName(), xbase+10, ybase+45);
+				
+				textSize(10);
+				text("Nearby Quakes: "+nearbyQuakes, xbase+10, ybase+65);
+				text("Avg Magnitude: "+String.format("%.2f", avgMag), xbase+10, ybase+80);
+				if (biggest != null)
+				{
+					text("Biggest:", xbase+10, ybase+95);
+					text("Magnitude "+biggest.getMagnitude(), xbase+25, ybase+110);
+					text("Depth "+biggest.getDepth(), xbase+25, ybase+125);
+					text("Within "+biggest.getStringProperty("age"), xbase+25, ybase+140);
+					if (biggest.isOnLand)
+					{
+						text("Land Quake", xbase+25, ybase+155);
+					}
+					else
+					{
+						text("Ocean Quake", xbase+25, ybase+155);
+					}
+				}
+			}
+		}
+	}
 	
 	private void sortAndPrint(int numToPrint)
 	{
@@ -218,6 +284,7 @@ public class EarthquakeCityMap extends PApplet {
 		for (Marker marker : cityMarkers) {
 			if (!marker.isHidden() && marker.isInside(map, mouseX, mouseY)) {
 				lastClicked = (CommonMarker)marker;
+				((CommonMarker) marker).setClicked(true);
 				// Hide all the other earthquakes and hide
 				for (Marker mhide : cityMarkers) {
 					if (mhide != lastClicked) {
@@ -267,10 +334,12 @@ public class EarthquakeCityMap extends PApplet {
 	private void unhideMarkers() {
 		for(Marker marker : quakeMarkers) {
 			marker.setHidden(false);
+			((CommonMarker) marker).setClicked(false); 
 		}
 			
 		for(Marker marker : cityMarkers) {
 			marker.setHidden(false);
+			((CommonMarker) marker).setClicked(false); 
 		}
 	}
 	

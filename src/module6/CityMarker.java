@@ -84,4 +84,9 @@ public class CityMarker extends CommonMarker {
 	{
 		return Float.parseFloat(getStringProperty("population"));
 	}
+	
+	public String getName()
+	{
+		return getCity()+", "+getCountry();
+	}
 }
