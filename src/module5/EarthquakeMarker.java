@@ -159,7 +159,5 @@ public abstract class EarthquakeMarker extends CommonMarker
 		return isOnLand;
 	}
 	
-
-	
 	
 }
